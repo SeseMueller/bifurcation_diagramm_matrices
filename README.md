@@ -35,7 +35,7 @@ matrix `n` times. This has the amazing property that there isn't a single number
 but rather an "infinite amount" (but not really) of numbers. This means that we can get a good picture with
 a relatively small amount of iterations. The downside is that we need to calculate the matrix, as well as
 multiply it with the bucket vector `n` times. This is done in `O(BUCKETS^3)` time.
-By the way, if you want render the image, _every pixel has to be a bucket_ or you lose resolution.
+By the way, if you want to render the image, _every pixel has to be a bucket_ or you lose resolution.
 
 This is already slower than the usual approach, but can we, given my original goal of calculating the logistic
 map in sub - `O(ITER)` time, do better?
@@ -47,8 +47,8 @@ The Answer is yes.
 The second approach is very similar to the first, but instead of multiplying the matrix with the bucket vector
 `n` times, we can multiply the matrix with **itself** `log(ITER)` times. This is possible because the matrix
 is a [stochastic matrix](https://en.wikipedia.org/wiki/Stochastic_matrix), meaning that all its entries are
-non-negative and the sum of each column is 1. (Also because we did it before, whether we calculate ((A\*A)^4)\*x
-or x <= Ax 16 times doesn't make a difference mathematically).
+non-negative and the sum of each column is 1. (Also because we did it before, whether we calculate $((A*A)^4)*x$
+or $x <= Ax 16$ times doesn't make a difference mathematically).
 
 **This way, we can actually calculate the logistic map in sub - `O(ITER)` time! My dream come true!**
 
@@ -80,13 +80,17 @@ and markov chains. I was thinking about what I was actually doing and tried to r
 With our Matrix $A$ and our vector $x$, we are calculating $A^n*x$. But we want $Ax=x$. Using linear algebra, we can
 rearrange:
 
-$$
-Ax=x \\
-Ax-x=0 \\
-Ax-Ix=0 \\
-(A-I)x=0 \\
-x=0
-$$
+$$ Ax=x $$
+
+$$ Ax-x=0 $$
+
+$$ Ax-Ix=0 $$
+
+$$ (A-I)x=0 $$
+
+$$ (A-I)^{-1}(A-I)x=(A-I)^{-1}0 $$
+
+$$ x=0 $$
 
 As it turns out, the "stable point" that is reached stochastically by iterating the logistic map ad infinitum in the
 usual approach by the law of large numbers actually doesn't exist here.
@@ -95,12 +99,13 @@ BUT, it just doesn't exist mathematically. As suckerpinch pointed out [in his am
 
 So I had the totally brilliant idea to just do that:
 
-$$
-Ax=x+\epsilon \\
-Ax-x=\epsilon \\
-(A-I)x=\epsilon \\
-x=\epsilon(A-I)^{-1}
-$$
+$$ Ax=x+\epsilon $$
+
+$$ Ax-x=\epsilon $$
+
+$$ (A-I)x=\epsilon $$
+
+$$ x=\epsilon(A-I)^{-1} $$
 
 Using the fact that the sum of all entries in $x$ is 1, we can actually calculate $x$ exactly. This is done by
 calculating the inverse of $A-I$ and multiplying it with $\epsilon$. This is done in `O(BUCKETS^3)` time, but that doesn't bother us anymore. We can now calculate the logistic map in `O(1)` time, not even needing to specify iteration count!
@@ -121,7 +126,7 @@ most matrices become invertible! We have finally found a way to reliably calcula
 
 But have we really?
 
-## Heresy 3 - The iteration strikes back: O($\infty$)???
+## Heresy 3 - The iteration strikes back: O(∞)???
 
 Yes, only most matrices become invertible. Some, by chance, don't. We _could_ change the matrix diagonal by slight amounts, but that would still not work definitively. (Also I just didn't think of it at the time)
 
